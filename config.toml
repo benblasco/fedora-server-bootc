@@ -1,0 +1,32 @@
+# Duplicated disabling of kernel mitigations already in Containerfile
+[customizations.kernel]
+# name - not yet supported
+append = "mitigations=off"
+
+[[customizations.group]]
+name = "media"
+gid = 1001
+
+[[customizations.group]]
+name = "bblasco"
+gid = 1000
+
+[[customizations.user]]
+name = "media"
+description = "User-created for media files"
+#home = "/var/home/media"
+#shell = "/bin/bash"
+#groups = ["users", "wheel"]
+uid = 1001
+gid = 1001
+
+[[customizations.user]]
+name = "bblasco"
+password = "$6$i9SPxDAyOKr1W21z$68B68.59AmDz1OQFhNdvctOa/F6eHKxLDNBynA57ThIw6/0Bsqrxto5rTs3fo3SHe98kO4qa8vzP8wi4Ragsu."
+description = "Benjamin Blasco"
+#home = "/var/home/bblasco"
+shell = "/bin/bash"
+groups = ["wheel", "media"]
+uid = 1000
+gid = 1000
+key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNlBGHxQGNYlDkB35Z/kPQNR+tfsYaO2gGLhbtkVI0uoXf5SewEz5ecH+u8jHIPElXZz227h5PpxhZFzfokqUJ/U3mbEpu1/Krf4/eERCqIgz2nmXoGLlOJHgMk4MpK6LA6eb6SXZHLpxFicbEcCxUU3A9hbzhWUGDaMFG7CcExT5JAD/7VcniONxZhlJxUzyL1xmbmAN13DQpiUkew25VtuNHby1fYTgMxVaezUMfMwZn6qpNJUDXGCKX1NWv5kqB9yFxRIQbFS4zAkQPXH6w7eksNyknexRDwM1zghnaspSvE1Kn2RWIaKt5hmaoKozJuC9YnCwJ bblasco@localhost.localdomain"
