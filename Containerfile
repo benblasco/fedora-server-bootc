@@ -29,13 +29,9 @@ RUN dnf install -y \
     hdparm sdparm lshw \
     tuned cockpit* firewalld
 
-# Disable kernel mitigations
-RUN grubby --update-kernel=ALL --args="mitigations=off"
-
-#ADD files/journald.conf.d/persistentlogs.conf /etc/systemd/journald.conf.d/
-ADD roles/common/files/journald.conf.d/persistentlogs.conf /etc/systemd/journald.conf.d/
-
-ADD files/sudoers.d/wheel-passwordless-sudo /etc/sudoers.d/wheel-passwordless-sudo
+ADD files/journald.conf.d/persistentlogs.conf /etc/systemd/journald.conf.d/
+ADD files/sudoers.d/wheel-passwordless-sudo /etc/sudoers.d/
+ADD files/registries.conf.d/001-micro-lan.conf /etc/registries.conf.d/
 
 RUN mkdir -p /var/log/journal && chown root:systemd-journal /var/log/journal
 
@@ -46,3 +42,5 @@ RUN systemctl enable tuned.service && systemctl disable bootc-fetch-apply-update
 # Run podman role WHICH WORKS IF YOU ALREADY HAVE THE RIGHT PACKAGES INSTALLED
 # Run tmux role WORKS IF TMUX ALREADY INSTALLED --skip-tags=install-tmux
 # Run librespot role
+# Install virtualisation stack
+# LVM Partitioning
