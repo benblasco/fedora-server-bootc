@@ -1,3 +1,8 @@
+# Unattended installation only supported for ISO format builds
+# https://osbuild.org/docs/user-guide/blueprint-reference/#installer
+[customizations.installer]
+unattended = true
+
 # Duplicated disabling of kernel mitigations already in Containerfile
 [customizations.kernel]
 # name - not yet supported (to assign a name)
