@@ -1,6 +1,6 @@
 # Duplicated disabling of kernel mitigations already in Containerfile
 [customizations.kernel]
-# name - not yet supported
+# name - not yet supported (to assign a name)
 append = "mitigations=off"
 
 [[customizations.group]]
@@ -42,29 +42,43 @@ minsize = "20 GiB"
 name = "rootlv"
 mountpoint = "/"
 label = "root"
-fs_type = "ext4"
-minsize = "5 GiB"
+fs_type = "xfs"
+minsize = "10 GiB"
 
-[[customizations.disk.partitions.logical_volumes]]
-name = "homelv"
-mountpoint = "/var/home"
-label = "home"
-fs_type = "ext4"
-minsize = "5 GiB"
+#[[customizations.disk.partitions.logical_volumes]]
+#name = "homelv"
+#mountpoint = "/var/home"
+#label = "home"
+#fs_type = "xfs"
+#minsize = "5 GiB"
 
 [[customizations.disk.partitions.logical_volumes]]
 name = "varloglv"
 mountpoint = "/var/log"
 label = "varlog"
-fs_type = "ext4"
-minsize = "5 GiB"
+fs_type = "xfs"
+minsize = "4 GiB"
 
 [[customizations.disk.partitions.logical_volumes]]
-name = "varlv"
-mountpoint = "/var"
-label = "var"
-fs_type = "ext4"
-minsize = "5 GiB"
+name = "varlibcontainersstoragelv"
+mountpoint = "/var/lib/containers/storage"
+#label = "rootcontainers"
+fs_type = "xfs"
+minsize = "2 GiB"
+
+[[customizations.disk.partitions.logical_volumes]]
+name = "mntcontainerslv"
+mountpoint = "/mnt/containers"
+#label = "usercontainers"
+fs_type = "xfs"
+minsize = "2 GiB"
+
+#[[customizations.disk.partitions.logical_volumes]]
+#name = "varlv"
+#mountpoint = "/var"
+#label = "var"
+#fs_type = "xfs"
+#minsize = "5 GiB"
 
 [[customizations.disk.partitions.logical_volumes]]
 name = "swaplv"
