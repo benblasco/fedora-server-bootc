@@ -1,0 +1,41 @@
+pipeline {
+    environment {
+        repoUrl = "https://github.com/benblasco/fedora-server-bootc"
+    }
+    agent {label 'fedora-server-bootc'}
+    stages {
+        stage('Identify build node') {
+            steps {
+                echo 'Identify build node'
+                sh 'hostnamectl'
+            }
+        }
+        stage('Clone Repo') {
+            steps {
+                echo 'Clone build repo'
+                git url: repoUrl, branch: 'main'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Build the Fedora Bootc Container'
+                sh 'sudo podman build -t localhost/fedora-bootc-testserver:latest . 
+            }
+        }
+        stage('Push') {
+            steps {
+                echo 'Push the build to the registry'
+                sh 'sudo podman push --tls-verify=false localhost/fedora-bootc-testserver:latest micro.lan:5000/fedora-bootc-testserver:latest'
+                sh 'timedatectl'
+            }
+        }
+    }
+    post {
+        always {
+            archiveArtifacts artifacts: 'fedora-server-bootc', fingerprint: true
+            //mail to: 'team@example.com',
+              //subject: "Librespot build result: ${currentBuild.fullDisplayName}",
+              //body: "This is what we did ${env.BUILD_URL}"
+        }
+    }
+}
