@@ -21,7 +21,10 @@ RUN dnf install -y \
     hdparm sdparm lshw \
     tuned cockpit* firewalld \
     python3-blivet stratis-cli stratisd \
-    tmux
+    tmux \
+    genisoimage cloud-utils \
+    libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
+    python3-libvirt python3-lxml edk2-ovmf
 
 ADD files/journald.conf.d/persistentlogs.conf /etc/systemd/journald.conf.d/
 ADD files/sudoers.d/wheel-passwordless-sudo /etc/sudoers.d/
@@ -34,6 +37,8 @@ RUN systemctl enable tuned.service && systemctl disable bootc-fetch-apply-update
 
 # How to change rootless users' container storage location 
 # https://access.redhat.com/solutions/7007159
+# The below needs to be repeated post-install if a separate mount point is being created for container storage.
+# This can be done through an ansible playbook or via other means
 # Note: the sed command is using the "|" character as a delimiter
 RUN mkdir -p -m 777 /var/mnt/containers && \
     cp -p /usr/share/containers/storage.conf /etc/containers/ && \
