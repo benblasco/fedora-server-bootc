@@ -12,6 +12,9 @@ https://github.com/osbuild/bootc-image-builder/?tab=readme-ov-file#-build-config
 Blueprint reference
 https://osbuild.org/docs/user-guide/blueprint-reference
 
+Master the art of bare metal deployments with image mode for RHEL
+https://developers.redhat.com/articles/2024/08/20/bare-metal-deployments-image-mode-rhel
+
 # Build the container
 
 ```
@@ -46,6 +49,16 @@ sudo podman push --tls-verify=false localhost/fedora-bootc-testserver:latest <re
 ```
 sudo bootc switch <registry host>:5000/fedora-bootc-testserver:latest
 ```
+
+# If you want to watch a text based automated install of an iso image in a KVM deployment
+
+Edit the bootloader entry at boot time by:
+1. Pressing `e` to edit
+2. Navigating to the end of the `linux` line
+3. Adding `console=ttyS0,9600` to the line
+4. Pressing ctrl+x to resume booting the iso
+
+Note: Do not use the delete key to delete characters, and also note that the backspace key acts like the delete key in that it deletes forward, but not backward!
 
 # Tasks to complete
 
