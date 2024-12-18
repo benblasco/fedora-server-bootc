@@ -7,12 +7,13 @@ FROM quay.io/fedora/fedora-bootc:41
 RUN dnf install -y http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
 RUN dnf update -y
 
+# Note: Removed packages ansible and ansible-lint because ansible-lint contains non UTF-8 characters in file names
+# https://github.com/containers/bootc/issues/975
 # Install common packages
 RUN dnf install -y \
     p7zip p7zip-plugins unrar \
     vim-enhanced htop openssh-server grubby git \
     wpa_supplicant screen mc smartmontools \
-    ansible ansible-lint \
     python3-requests-oauthlib \
     lm_sensors lm_sensors-sensord \
     java-11-openjdk dnf-utils \
