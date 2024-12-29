@@ -15,6 +15,9 @@ https://osbuild.org/docs/user-guide/blueprint-reference
 Master the art of bare metal deployments with image mode for RHEL
 https://developers.redhat.com/articles/2024/08/20/bare-metal-deployments-image-mode-rhel
 
+Jumpstart GitOps with image mode 
+https://www.redhat.com/en/blog/jumpstart-gitops-image-mode
+
 # Build the container
 
 ```
