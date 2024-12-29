@@ -27,6 +27,10 @@ RUN dnf install -y \
     libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
     python3-libvirt python3-lxml edk2-ovmf
 
+# Temporary package addition required for my Lenovo Yoga 370 laptop so I can test over wifi
+RUN dnf install -y \
+    pciutils inxi iwl\*
+
 ADD files/journald.conf.d/persistentlogs.conf /etc/systemd/journald.conf.d/
 ADD files/sudoers.d/wheel-passwordless-sudo /etc/sudoers.d/
 ADD files/registries.conf.d/001-micro-lan.conf /etc/containers/registries.conf.d/
