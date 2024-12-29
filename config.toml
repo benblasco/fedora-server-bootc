@@ -57,33 +57,33 @@ minsize = "10 GiB"
 #fs_type = "xfs"
 #minsize = "5 GiB"
 
-[[customizations.disk.partitions.logical_volumes]]
-name = "varloglv"
-mountpoint = "/var/log"
-label = "varlog"
-fs_type = "xfs"
-minsize = "4 GiB"
+#[[customizations.disk.partitions.logical_volumes]]
+#name = "varloglv"
+#mountpoint = "/var/log"
+#label = "varlog"
+#fs_type = "xfs"
+#minsize = "5 GiB"
 
-[[customizations.disk.partitions.logical_volumes]]
-name = "varlibcontainersstoragelv"
-mountpoint = "/var/lib/containers/storage"
+#[[customizations.disk.partitions.logical_volumes]]
+#name = "varlibcontainersstoragelv"
+#mountpoint = "/var/lib/containers/storage"
 #label = "rootcontainers"
-fs_type = "xfs"
-minsize = "2 GiB"
+#fs_type = "xfs"
+#minsize = "5 GiB"
 
 [[customizations.disk.partitions.logical_volumes]]
 name = "mntcontainerslv"
 mountpoint = "/mnt/containers"
 #label = "usercontainers"
 fs_type = "xfs"
-minsize = "2 GiB"
+minsize = "5 GiB"
 
-#[[customizations.disk.partitions.logical_volumes]]
-#name = "varlv"
-#mountpoint = "/var"
+[[customizations.disk.partitions.logical_volumes]]
+name = "varlv"
+mountpoint = "/var"
 #label = "var"
-#fs_type = "xfs"
-#minsize = "5 GiB"
+fs_type = "xfs"
+minsize = "5 GiB"
 
 [[customizations.disk.partitions.logical_volumes]]
 name = "swaplv"
