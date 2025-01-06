@@ -29,8 +29,8 @@ RUN dnf install -y \
     alsa-utils
 
 # Temporary package addition required for my Lenovo Yoga 370 laptop so I can test over wifi
-RUN dnf install -y \
-    pciutils inxi iwl\*
+#RUN dnf install -y \
+#    pciutils inxi iwl\*
 
 ADD files/journald.conf.d/persistentlogs.conf /etc/systemd/journald.conf.d/
 ADD files/sudoers.d/wheel-passwordless-sudo /etc/sudoers.d/
