@@ -26,6 +26,7 @@ RUN dnf install -y \
     genisoimage cloud-utils \
     libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
     python3-libvirt python3-lxml edk2-ovmf \
+    podman buildah skopeo \
     alsa-utils
 
 # Temporary package addition required for my Lenovo Yoga 370 laptop so I can test over wifi
