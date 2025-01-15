@@ -40,7 +40,7 @@ ADD files/chrony.conf /etc/
 
 RUN mkdir -p /var/log/journal && chown root:systemd-journal /var/log/journal
 
-RUN systemctl enable --now tuned.service && systemctl mask --now bootc-fetch-apply-updates.timer
+RUN systemctl enable tuned.service && systemctl mask bootc-fetch-apply-updates.timer
 
 # How to change rootless users' container storage location 
 # https://access.redhat.com/solutions/7007159
