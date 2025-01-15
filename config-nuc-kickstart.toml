@@ -13,6 +13,9 @@ clearpart --drives=nvme0n1 --all --initlabel --disklabel=gpt
 reqpart --add-boot
 #autopart --noswap --type=lvm
 
+# Add the container image to install
+ostreecontainer --url micro.lan:5000/fedora-bootc-testserver:latest
+
 # Disk partitioning information
 # https://developers.redhat.com/articles/2024/08/20/bare-metal-deployments-image-mode-rhel?source=sso#example_kickstart
 part pv.01 --size=40208 --grow --ondisk=nvme0n1

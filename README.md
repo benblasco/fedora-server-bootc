@@ -37,6 +37,7 @@ sudo podman run --rm -it \
 quay.io/centos-bootc/bootc-image-builder:latest \
 --type qcow2 \
 --rootfs btrfs \
+--progress verbose \
 --local \
 localhost/fedora-bootc-testserver:latest
 ```
