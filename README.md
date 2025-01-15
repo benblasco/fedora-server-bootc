@@ -23,6 +23,13 @@ https://www.redhat.com/en/blog/jumpstart-gitops-image-mode
 ```
 sudo podman build --squash -t fedora-bootc-testserver:latest . 
 ```
+Note: `--squash` is optional, and possibly not helpful
+
+# Push to my local registry
+
+```
+sudo podman push --tls-verify=false localhost/fedora-bootc-testserver:latest <registry host>:5000/fedora-bootc-testserver:latest
+```
 
 # Generate the bootable image
 
@@ -39,20 +46,25 @@ quay.io/centos-bootc/bootc-image-builder:latest \
 --rootfs btrfs \
 --progress verbose \
 --local \
-localhost/fedora-bootc-testserver:latest
-```
-
-# Push to my local registry
-
-```
-sudo podman push --tls-verify=false localhost/fedora-bootc-testserver:latest <registry host>:5000/fedora-bootc-testserver:latest
+<registry host>:5000/fedora-bootc-testserver:latest
 ```
 
 # Switch running image to my local registry
 
+Note: This is only necessary if your bootable image was built using a different location for the container image.
+
 ```
 sudo bootc switch <registry host>:5000/fedora-bootc-testserver:latest
 ```
+
+# Alternate baremetal deployment method: use mkksiso
+
+1. Put everything you need into a kickstart file, and ensure it contains an `ostreecontainer` directive pointing at the container image
+2. Locally: `dnf install mkksiso`
+3. Locally: Download a Fedora netinst iso
+4. Use mkksiso to generate an iso using the source iso and the kickstart file, e.g. 
+`mkksiso --ks config-nuc-kickstart.ks Fedora-Server-netinst-x86_64-41-1.4.iso nuc-kickstart.iso`
+5. Write the iso to usb and insert into the system you are installing
 
 # If you want to watch a text based automated install of an iso image in a KVM deployment
 
