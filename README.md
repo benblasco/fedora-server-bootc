@@ -59,9 +59,13 @@ sudo bootc switch <registry host>:5000/fedora-bootc-testserver:latest
 
 # Alternate baremetal deployment method: use mkksiso
 
-1. Put everything you need into a kickstart file, and ensure it contains an `ostreecontainer` directive pointing at the container image
+Source: https://weldr.io/lorax/mkksiso.html
+Thank you to Achilleas Koutsou from the Image Builder team for his time and help!
+
+1. Put everything you need into a kickstart file, and ensure it contains an `ostreecontainer` directive pointing at the container image, e.g. 
+`ostreecontainer --url <registry host>:5000/fedora-bootc-testserver:latest --no-signature-verification --transport=registry`
 2. Locally: `dnf install mkksiso`
-3. Locally: Download a Fedora netinst iso
+3. Locally: Download a Fedora netinst iso (the smallest you can find)
 4. Use mkksiso to generate an iso using the source iso and the kickstart file, e.g. 
 `mkksiso --ks config-nuc-kickstart.ks Fedora-Server-netinst-x86_64-41-1.4.iso nuc-kickstart.iso`
 5. Write the iso to usb and insert into the system you are installing
