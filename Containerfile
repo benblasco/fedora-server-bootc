@@ -27,7 +27,33 @@ RUN dnf install -y \
     libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
     python3-libvirt python3-lxml edk2-ovmf \
     podman buildah skopeo \
-    alsa-utils
+    alsa-utils fwupd-efi
+
+# Packages required for each Ansible role
+### Command to get the list
+# cd /var/home/bblasco/.ansible/collections/ansible_collections/fedora/linux_system_roles/roles
+# for i in `echo "storage firewall timesync cockpit podman"`; do echo ROLE $i; $i/.ostree/get_ostree_data.sh packages runtime Fedora-41 raw; done
+### storage
+# cryptsetup e2fsprogs kpartx libblockdev-crypto libblockdev-dm \
+# libblockdev-lvm libblockdev-mdraid libblockdev-swap lvm2 python3-blivet \
+# stratis-cli stratisd xfsprogs
+### firewall
+# firewalld
+### timesync
+# chrony linuxptp
+### cockpiRUN ln -s /usr/share/zoneinfo/Australia/Melbourne /etc/localtimet
+# certmonger cockpit-* policycoreutils-python-utils python3-cryptography \
+# python3-dbus python3-libselinux python3-packaging python3-policycoreutils \
+# python3-pyasn1
+### podman
+# iptables-nft podman policycoreutils-python-utils \
+# python3-libselinux python3-policycoreutils shadow-utils-subid
+
+# java-11-openjdk is for Jenkins agent
+# alsa-utils is for librespot
+# fwupd-efi is for secure firmware updates via fwupdmgw
+# libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm is for stackhpc-libvirt-host role
+# genisoimage cloud-utils is for use cloud-init when launching vms (stackhpc-libvirt-vm role)
 
 # Temporary package addition required for my Lenovo Yoga 370 laptop so I can test over wifi
 #RUN dnf install -y \
@@ -40,7 +66,8 @@ ADD files/chrony.conf /etc/
 
 RUN mkdir -p /var/log/journal && chown root:systemd-journal /var/log/journal
 
-RUN systemctl enable tuned.service && systemctl mask bootc-fetch-apply-updates.timer
+RUN systemctl enable tuned.service && \
+    systemctl mask bootc-fetch-apply-updates.timer
 
 # How to change rootless users' container storage location 
 # https://access.redhat.com/solutions/7007159
@@ -55,3 +82,6 @@ RUN mkdir -p -m 777 /var/mnt/containers && \
 
 # Set the timezone
 RUN ln -s /usr/share/zoneinfo/Australia/Melbourne /etc/localtime
+
+# Lint the container image
+RUN bootc container lint
