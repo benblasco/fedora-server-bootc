@@ -13,7 +13,7 @@ text --non-interactive
 network --bootproto=dhcp --device=link --activate --onboot=on
 zerombr
 # For the command below it is critical to specify the disk otherwise it will erase ALL disks attached to the system
-clearpart --drives=sda3 --all --initlabel --disklabel=gpt
+clearpart --drives=nvme0n1 --all --initlabel --disklabel=gpt
 reqpart --add-boot
 #autopart --noswap --type=lvm
 
@@ -24,13 +24,13 @@ ostreecontainer --url micro.lan:5000/fedora-bootc-testserver:latest --no-signatu
 # https://developers.redhat.com/articles/2024/08/20/bare-metal-deployments-image-mode-rhel?source=sso#example_kickstart
 part pv.01 --size=40208 --grow --ondisk=nvme0n1
 volgroup vg_fedora pv.01
-logvol / --vgname=vg_fedora --size=20480 --name=lv_root --fstype=xfs
+logvol / --vgname=vg_fedora --size=25200 --name=lv_root --fstype=xfs
 logvol /var --vgname=vg_fedora --size=10240 --name=lv_var --fstype=xfs
 logvol /var/log --vgname=vg_fedora --size=10240 --name=lv_varlog --fstype=xfs
 logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
-logvol /var/lib/containers/storage --vgname=vg_fedora --size=4096 --name=lv_root_containers --fstype=xfs
-logvol /var/mnt/containers/storage --vgname=vg_fedora --size=4096 --name=lv_user_containers --fstype=xfs
-logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=102400 --name=lv_vm_pool --fstype=xfs
+logvol /var/lib/containers/storage --vgname=vg_fedora --size=10240 --name=lv_root_containers --fstype=xfs
+logvol /var/mnt/containers/storage --vgname=vg_fedora --size=10240 --name=lv_user_containers --fstype=xfs
+logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=204800 --name=lv_vm_pool --fstype=xfs
 
 # https://docs.fedoraproject.org/en-US/fedora/f36/install-guide/appendixes/Kickstart_Syntax_Reference/#sect-kickstart-commands-users-groups
 # Generate an ssh key using the command `openssl passwd -6`
