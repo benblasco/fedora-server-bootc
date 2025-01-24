@@ -70,6 +70,9 @@ Thank you to Achilleas Koutsou from the Image Builder team for his time and help
 `mkksiso --ks config-nuc-kickstart.ks Fedora-Server-netinst-x86_64-41-1.4.iso nuc-kickstart.iso`
 5. Write the iso to usb and insert into the system you are installing
 
+Note: If you are running the above on a bootc-based system and don't have mkksiso already installed, you will need to install and run
+mkksiso via a Toolbx *rootful* container
+
 # If you want to watch a text based automated install of an iso image in a KVM deployment
 
 Edit the bootloader entry at boot time by:
