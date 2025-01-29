@@ -61,10 +61,12 @@ EOF
 #RUN dnf install -y \
 #    pciutils inxi iwl\*
 
-ADD files/journald.conf.d/persistentlogs.conf /etc/systemd/journald.conf.d/
-ADD files/sudoers.d/wheel-passwordless-sudo /etc/sudoers.d/
-ADD files/registries.conf.d/001-micro-lan.conf /etc/containers/registries.conf.d/
-ADD files/chrony.conf /etc/
+# Copy persistent config files for:
+# - Persistent journal logs
+# - sudoers config
+# - Private container registry
+# - Chrony config
+COPY files/etc /etc/
 
 RUN <<EOF 
     mkdir -p /var/log/journal 
