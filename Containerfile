@@ -22,7 +22,7 @@ RUN <<EOF
     hdparm sdparm lshw \
     tuned cockpit* firewalld \
     python3-blivet stratis-cli stratisd \
-    tmux \
+    tmux rclone\
     genisoimage cloud-utils \
     libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
     python3-libvirt python3-lxml edk2-ovmf \
@@ -43,7 +43,7 @@ EOF
 # firewalld
 ### timesync
 # chrony linuxptp
-### cockpiRUN ln -s /usr/share/zoneinfo/Australia/Melbourne /etc/localtimet
+### cockpit
 # certmonger cockpit-* policycoreutils-python-utils python3-cryptography \
 # python3-dbus python3-libselinux python3-packaging python3-policycoreutils \
 # python3-pyasn1
