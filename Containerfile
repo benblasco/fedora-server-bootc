@@ -68,11 +68,13 @@ EOF
 # - Chrony config
 COPY files/etc /etc/
 
+# Create the journal file
 RUN <<EOF 
     mkdir -p /var/log/journal 
     chown root:systemd-journal /var/log/journal
 EOF
 
+# Enable tuned and disable bootc auto updates
 RUN <<EOF 
     systemctl enable tuned.service
     systemctl mask bootc-fetch-apply-updates.timer
