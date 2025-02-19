@@ -74,9 +74,10 @@ RUN <<EOF
     chown root:systemd-journal /var/log/journal
 EOF
 
-# Enable tuned and disable bootc auto updates
+# Enable tuned, podman-podman-auto-update, and disable bootc auto updates
 RUN <<EOF 
     systemctl enable tuned.service
+    systemctl enable podman-auto-update.timer
     systemctl mask bootc-fetch-apply-updates.timer
 EOF
 
