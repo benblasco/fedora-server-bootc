@@ -1,8 +1,16 @@
 pipeline {
     environment {
-        repoUrl = "https://github.com/benblasco/fedora-server-bootc"
+        REPO_URL = "https://github.com/benblasco/fedora-server-bootc"
+        REPO_BRANCH = "main"
+        IMAGE_NAME = "fedora-bootc-testserver"
+        REGISTRY = "micro.lan:5000"
+        DATESTAMP = sh(
+                        script: """
+                        date +Y%m%d
+                        """, returnStdout: true
+                    )
     }
-    agent {label 'fedora-server-bootc'}
+    agent { label 'fedora-server-bootc' }
     stages {
         stage('Identify build node') {
             steps {
@@ -13,19 +21,20 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 echo 'Clone build repo'
-                git url: repoUrl, branch: 'main'
+                git url: REPOURL, branch: REPO_BRANCH
             }
         }
-        stage('Build') {
+        stage('Build the image') {
             steps {
                 echo 'Build the Fedora Bootc Container'
-                sh 'sudo podman build -t localhost/fedora-bootc-testserver:latest . 
+                sh 'sudo podman build --pull=always -t REGISTRY/IMAGE_NAME:latest -t REGISTRY/IMAGE_NAME:DATESTAMP .'
             }
         }
-        stage('Push') {
+        stage('Push to the container registry') {
             steps {
                 echo 'Push the build to the registry'
-                sh 'sudo podman push --tls-verify=false localhost/fedora-bootc-testserver:latest micro.lan:5000/fedora-bootc-testserver:latest'
+                sh 'sudo podman push --tls-verify=false REGISTRY/IMAGE_NAME:latest'
+                sh 'sudo podman push --tls-verify=false REGISTRY/IMAGE_NAME:DATESTAMP'
                 sh 'timedatectl'
             }
         }
