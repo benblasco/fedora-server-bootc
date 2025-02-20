@@ -29,7 +29,7 @@ logvol /var --vgname=vg_fedora --size=10240 --name=lv_var --fstype=xfs
 logvol /var/log --vgname=vg_fedora --size=10240 --name=lv_varlog --fstype=xfs
 logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
 logvol /var/lib/containers/storage --vgname=vg_fedora --size=10240 --name=lv_root_containers --fstype=xfs
-logvol /var/mnt/containers/storage --vgname=vg_fedora --size=10240 --name=lv_user_containers --fstype=xfs
+logvol /var/mnt/containers --vgname=vg_fedora --size=20480 --name=lv_user_containers --fstype=xfs
 logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=204800 --name=lv_vm_pool --fstype=xfs
 
 # https://docs.fedoraproject.org/en-US/fedora/f36/install-guide/appendixes/Kickstart_Syntax_Reference/#sect-kickstart-commands-users-groups
