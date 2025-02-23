@@ -4,7 +4,15 @@ cat > /etc/containers/registries.conf.d/local-registry.conf << 'EOF'
 # Allow use of micro.lan as an insecure registry
 # https://containers.github.io/bootc/registries-and-offline.html
 [[registry]]
-location="micro.lan:5000"
+location="nuc.lan:5000"
+insecure=true
+EOF
+
+cat > /etc/containers/registries.conf.d/local-registry.conf << 'EOF'
+# Allow use of nuc.lan as an insecure registry
+# https://containers.github.io/bootc/registries-and-offline.html
+[[registry]]
+location="nuc.lan:5000"
 insecure=true
 EOF
 %end
@@ -18,7 +26,9 @@ reqpart --add-boot
 #autopart --noswap --type=lvm
 
 # Add the container image to install
-ostreecontainer --url micro.lan:5000/fedora-bootc-testserver:latest --no-signature-verification --transport=registry
+#ostreecontainer --url nuc.lan:5000/fedora-bootc-testserver:latest --no-signature-verification --transport=registry
+# Colin Walters: "You don't need --no-signature-verification anymore, it does nothing"
+ostreecontainer --url nuc.lan:5000/fedora-bootc-testserver:latest --transport=registry
 
 # Disk partitioning information
 # https://developers.redhat.com/articles/2024/08/20/bare-metal-deployments-image-mode-rhel?source=sso#example_kickstart
@@ -41,11 +51,16 @@ user --name=bblasco --uid=1000 --gid=1000 --homedir=/var/home/bblasco --shell=/b
 sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNlBGHxQGNYlDkB35Z/kPQNR+tfsYaO2gGLhbtkVI0uoXf5SewEz5ecH+u8jHIPElXZz227h5PpxhZFzfokqUJ/U3mbEpu1/Krf4/eERCqIgz2nmXoGLlOJHgMk4MpK6LA6eb6SXZHLpxFicbEcCxUU3A9hbzhWUGDaMFG7CcExT5JAD/7VcniONxZhlJxUzyL1xmbmAN13DQpiUkew25VtuNHby1fYTgMxVaezUMfMwZn6qpNJUDXGCKX1NWv5kqB9yFxRIQbFS4zAkQPXH6w7eksNyknexRDwM1zghnaspSvE1Kn2RWIaKt5hmaoKozJuC9YnCwJ bblasco@localhost.localdomain"
 
 %post
+
 # Note we are setting the path to /mnt/containers because there's already
 # an SELinux equivalency rule between /var/mnt and /mnt
 # See the output of `semanage fcontext --list | grep mnt`
 # The commands wouldn't work on /var/mnt/containers
-semanage fcontext -a -e /var/lib/containers /mnt/containers
+# See examples here:
+# https://linux.die.net/man/8/semanage
+# https://docs.redhat.com/en/documentation/red_hat_enterprise_linux/6/html/security-enhanced_linux/sect-security-enhanced_linux-selinux_contexts_labeling_files-persistent_changes_semanage_fcontext#sect-Security-Enhanced_Linux-SELinux_Contexts_Labeling_Files-Persistent_Changes_semanage_fcontext
+# https://www.redhat.com/en/blog/semanage-keep-selinux-enforcing
+#semanage fcontext -a -e /var/lib/containers /mnt/containers
 semanage fcontext -a -e /var/lib/containers '/mnt/containers(/.*)?'
 restorecon -Rv /mnt/containers
 
