@@ -60,7 +60,7 @@ sudo bootc switch <registry host>:5000/fedora-bootc-testserver:latest
 # Alternate baremetal deployment method: use mkksiso
 
 Source: https://weldr.io/lorax/mkksiso.html
-Thank you to Achilleas Koutsou from the Image Builder team for his time and help!
+Thank you to Achilleas Koutsou from the Red Hat Image Builder team for his time and help!
 
 1. Put everything you need into a kickstart file, and ensure it contains an `ostreecontainer` directive pointing at the container image, e.g. 
 `ostreecontainer --url <registry host>:5000/fedora-bootc-testserver:latest --no-signature-verification --transport=registry`
@@ -70,8 +70,8 @@ Thank you to Achilleas Koutsou from the Image Builder team for his time and help
 `mkksiso --ks config-nuc-kickstart.ks Fedora-Server-netinst-x86_64-41-1.4.iso nuc-kickstart.iso`
 5. Write the iso to usb and insert into the system you are installing
 
-Note: If you are running the above on a bootc-based system and don't have mkksiso already installed, you will need to install and run
-mkksiso via a Toolbx *rootful* container
+Note: If you are running the above on a bootc-based system and don't have mkksiso already installed, you will need to install and run mkksiso via a Toolbx *rootful* container, which mounts the entire filesystem under `/run/host`
+Source: https://discussion.fedoraproject.org/t/toolbox-and-access-to-file-systems/28872/4
 
 # If you want to watch a text based automated install of an iso image in a KVM deployment
 
