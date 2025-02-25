@@ -73,6 +73,18 @@ Thank you to Achilleas Koutsou from the Red Hat Image Builder team for his time 
 Note: If you are running the above on a bootc-based system and don't have mkksiso already installed, you will need to install and run mkksiso via a Toolbx *rootful* container, which mounts the entire filesystem under `/run/host`
 Source: https://discussion.fedoraproject.org/t/toolbox-and-access-to-file-systems/28872/4
 
+# Validating your kickstart file
+
+Save a lot of time and effort by validating your kickstart file before attempting deployment!
+
+How to validate the kickstart file to correct the syntax errors?
+https://access.redhat.com/solutions/2132051
+
+TL;DR Just install the `ksvalidator` package and then run it with the following command
+```
+ksvalidator <kickstart file>
+```
+
 # If you want to watch a text based automated install of an iso image in a KVM deployment
 
 Edit the bootloader entry at boot time by:
