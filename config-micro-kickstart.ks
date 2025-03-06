@@ -1,20 +1,22 @@
 %pre
+
 mkdir -p /etc/containers/registries.conf.d/
-cat > /etc/containers/registries.conf.d/local-registry.conf << 'EOF'
+cat > /etc/containers/registries.conf.d/001-micro-lan.conf << 'EOF'
 # Allow use of micro.lan as an insecure registry
 # https://containers.github.io/bootc/registries-and-offline.html
 [[registry]]
-location="nuc.lan:5000"
+location="micro.lan:5000"
 insecure=true
 EOF
 
-cat > /etc/containers/registries.conf.d/local-registry.conf << 'EOF'
+cat > /etc/containers/registries.conf.d/002-nuc-lan.conf << 'EOF'
 # Allow use of nuc.lan as an insecure registry
 # https://containers.github.io/bootc/registries-and-offline.html
 [[registry]]
 location="nuc.lan:5000"
 insecure=true
 EOF
+
 %end
 
 text --non-interactive
@@ -24,6 +26,12 @@ zerombr
 clearpart --drives=sda3 --all --initlabel --disklabel=gpt
 reqpart --add-boot
 #autopart --noswap --type=lvm
+
+# Disable kernel mitigations
+# Disable graphics driver loading until after boot (Microserver only)
+# What is "nomodeset" kernel parameter and is it safe to use?
+# https://access.redhat.com/solutions/81623
+bootloader --append="mitigations=off nomodeset"
 
 # Add the container image to install
 #ostreecontainer --url nuc.lan:5000/fedora-bootc-testserver:latest --no-signature-verification --transport=registry
@@ -41,6 +49,7 @@ logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
 logvol /var/lib/containers/storage --vgname=vg_fedora --size=20480 --name=lv_root_containers --fstype=xfs
 logvol /var/mnt/containers --vgname=vg_fedora --size=40960 --name=lv_user_containers --fstype=xfs
 logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=40960 --name=lv_vm_pool --fstype=xfs
+logvol swap --vgname vg_fedora --recommended --name=lv_swap --fstype=swap
 
 # https://docs.fedoraproject.org/en-US/fedora/f36/install-guide/appendixes/Kickstart_Syntax_Reference/#sect-kickstart-commands-users-groups
 # Generate an ssh key using the command `openssl passwd -6`
@@ -50,7 +59,7 @@ group --name=bblasco --gid=1000
 user --name=bblasco --uid=1000 --gid=1000 --homedir=/var/home/bblasco --shell=/bin/bash --groups=wheel,media,libvirt --iscrypted --password=$6$ArTIFqSrXLP8FNs6$bRAmZtJduALiKsZOSMo28mnW8nlNKqPw7zTf5YMdaTgsqjLHqGNYS4zoGRd1v43rF8P16araFnQabBuFxyNfL.
 sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNlBGHxQGNYlDkB35Z/kPQNR+tfsYaO2gGLhbtkVI0uoXf5SewEz5ecH+u8jHIPElXZz227h5PpxhZFzfokqUJ/U3mbEpu1/Krf4/eERCqIgz2nmXoGLlOJHgMk4MpK6LA6eb6SXZHLpxFicbEcCxUU3A9hbzhWUGDaMFG7CcExT5JAD/7VcniONxZhlJxUzyL1xmbmAN13DQpiUkew25VtuNHby1fYTgMxVaezUMfMwZn6qpNJUDXGCKX1NWv5kqB9yFxRIQbFS4zAkQPXH6w7eksNyknexRDwM1zghnaspSvE1Kn2RWIaKt5hmaoKozJuC9YnCwJ bblasco@localhost.localdomain"
 
-%post
+%post --log=/root/ks-post.log
 
 # Note we are setting the path to /mnt/containers because there's already
 # an SELinux equivalency rule between /var/mnt and /mnt
@@ -63,6 +72,15 @@ sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNl
 #semanage fcontext -a -e /var/lib/containers /mnt/containers
 semanage fcontext -a -e /var/lib/containers '/mnt/containers(/.*)?'
 restorecon -Rv /mnt/containers
+
+cat >> /etc/fstab<<EOF
+LABEL=SEAGATE1 /mnt/sg1 ext4 defaults,nofail 0 0
+LABEL=WD_SG3 /mnt/sg3 ext4 defaults,nofail 0 0
+LABEL=WD_XFS1 /mnt/wd_xfs1 xfs defaults,nofail 0 0
+LABEL=WD_MARTIN /mnt/martinbackup ext4 defaults,nofail 0 0
+nuc.lan:/mnt/sg2 /mnt/sg2 nfs x-systemd.after=network-online.target 0 0
+nuc.lan:/var/mnt/vm_images /mnt/vm_images nfs x-systemd.after=network-online.target 0 0
+EOF
 
 %end
 
