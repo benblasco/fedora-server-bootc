@@ -23,7 +23,7 @@ text --non-interactive
 network --bootproto=dhcp --device=link --activate --onboot=on
 zerombr
 # For the command below it is critical to specify the disk otherwise it will erase ALL disks attached to the system
-clearpart --drives=sda3 --all --initlabel --disklabel=gpt
+clearpart --drives=sda --all --initlabel --disklabel=gpt
 reqpart --add-boot
 #autopart --noswap --type=lvm
 
@@ -40,7 +40,7 @@ ostreecontainer --url nuc.lan:5000/fedora-bootc-testserver:latest --transport=re
 
 # Disk partitioning information
 # https://developers.redhat.com/articles/2024/08/20/bare-metal-deployments-image-mode-rhel?source=sso#example_kickstart
-part pv.01 --size=40208 --grow --ondisk=nvme0n1
+part pv.01 --size=40208 --grow --ondisk=sda
 volgroup vg_fedora pv.01
 logvol / --vgname=vg_fedora --size=25200 --name=lv_root --fstype=xfs
 logvol /var --vgname=vg_fedora --size=10240 --name=lv_var --fstype=xfs
@@ -72,13 +72,15 @@ sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNl
 #semanage fcontext -a -e /var/lib/containers /mnt/containers
 semanage fcontext -a -e /var/lib/containers '/mnt/containers(/.*)?'
 restorecon -Rv /mnt/containers
+chmod 777 /var/mnt/containers
 
 cat >> /etc/fstab<<EOF
-LABEL=SEAGATE1 /mnt/sg1 ext4 defaults,nofail 0 0
-LABEL=WD_SG3 /mnt/sg3 ext4 defaults,nofail 0 0
-LABEL=WD_XFS1 /mnt/wd_xfs1 xfs defaults,nofail 0 0
-LABEL=WD_MARTIN /mnt/martinbackup ext4 defaults,nofail 0 0
-nuc.lan:/mnt/sg2 /mnt/sg2 nfs x-systemd.after=network-online.target 0 0
+LABEL=SEAGATE1 /var/mnt/sg1 ext4 defaults,nofail 0 0
+LABEL=WD_SG3 /var/mnt/sg3 ext4 defaults,nofail 0 0
+LABEL=WD_XFS1 /var/mnt/wd_xfs1 xfs defaults,nofail 0 0
+LABEL=WD_MARTIN /var/mnt/martinbackup ext4 defaults,nofail 0 0
+LABEL=WD_SPARE /var/mnt/spare xfs defaults,nofail 0 0
+nuc.lan:/var/mnt/sg2 /mnt/sg2 nfs x-systemd.after=network-online.target 0 0
 nuc.lan:/var/mnt/vm_images /mnt/vm_images nfs x-systemd.after=network-online.target 0 0
 EOF
 
