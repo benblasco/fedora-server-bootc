@@ -21,7 +21,7 @@ pipeline {
         stage('Clone Repo') {
             steps {
                 echo 'Clone build repo'
-                git url: REPOURL, branch: REPO_BRANCH
+                git url: REPO_URL, branch: REPO_BRANCH
             }
         }
         stage('Build the image') {
