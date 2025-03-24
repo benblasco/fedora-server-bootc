@@ -32,9 +32,10 @@ pipeline {
         }
         stage('Push to the container registry') {
             steps {
-                echo 'Push the build to the registry'
+                echo 'Push the build to the registry/registries'
                 script {
                     env.REGISTRY.tokenize(",").each {
+                        echo "Pushing image to registry ${it}"
                         sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:latest ${it}/${IMAGE_NAME}:latest'
                         sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:${DATESTAMP} ${it}/${IMAGE_NAME}:${DATESTAMP}'
                     }
