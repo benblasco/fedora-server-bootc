@@ -16,7 +16,7 @@ RUN <<EOF
     wpa_supplicant screen mc smartmontools \
     python3-requests-oauthlib \
     lm_sensors lm_sensors-sensord \
-    java-11-openjdk dnf-utils \
+    java-17-openjdk dnf-utils \
     setools-console setroubleshoot-server \
     strace ncdu python3-pip \
     hdparm sdparm lshw \
