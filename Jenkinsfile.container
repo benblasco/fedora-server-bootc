@@ -6,7 +6,7 @@ pipeline {
         REGISTRY = "micro.lan:5000"
         DATESTAMP = sh(
                         script: """
-                        date %Y%m%d
+                        date +%Y%m%d
                         """, returnStdout: true
                     )
     }
