@@ -27,14 +27,14 @@ pipeline {
         stage('Build the image') {
             steps {
                 echo 'Build the Fedora Bootc Container'
-                sh 'sudo podman build --pull=always -t REGISTRY/IMAGE_NAME:latest -t REGISTRY/IMAGE_NAME:DATESTAMP .'
+                sh 'sudo podman build --pull=always -t ${REGISTRY}/${IMAGE_NAME}:latest -t ${REGISTRY/IMAGE_NAME}:${DATESTAMP} .'
             }
         }
         stage('Push to the container registry') {
             steps {
                 echo 'Push the build to the registry'
-                sh 'sudo podman push --tls-verify=false REGISTRY/IMAGE_NAME:latest'
-                sh 'sudo podman push --tls-verify=false REGISTRY/IMAGE_NAME:DATESTAMP'
+                sh 'sudo podman push --tls-verify=false ${REGISTRY}/${IMAGE_NAME}:latest'
+                sh 'sudo podman push --tls-verify=false ${REGISTRY}/${IMAGE_NAME}:${DATESTAMP}'
                 sh 'timedatectl'
             }
         }
