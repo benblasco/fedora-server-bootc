@@ -39,12 +39,12 @@ pipeline {
             }
         }
     }
-    post {
-        always {
+    //post {
+        //always {
             //archiveArtifacts artifacts: 'fedora-server-bootc', fingerprint: true
             //mail to: 'team@example.com',
               //subject: "Librespot build result: ${currentBuild.fullDisplayName}",
               //body: "This is what we did ${env.BUILD_URL}"
-        }
-    }
+        //}
+    //}
 }
