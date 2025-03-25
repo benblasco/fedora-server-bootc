@@ -3,7 +3,7 @@ pipeline {
         REPO_URL = "https://github.com/benblasco/fedora-server-bootc"
         REPO_BRANCH = "main"
         IMAGE_NAME = "fedora-bootc-testserver"
-        REGISTRY = "micro.lan:5000,nuc.lan:5000"
+        REGISTRY = ['micro.lan:5000','nuc.lan:5000']
         DATESTAMP = sh(
                         script: """
                         date +%Y%m%d
@@ -34,10 +34,10 @@ pipeline {
             steps {
                 echo 'Push the build to the registry/registries'
                 script {
-                    env.REGISTRY.tokenize(",").each {
-                        echo "Pushing image to registry ${it}"
-                        sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:latest ${it}/${IMAGE_NAME}:latest'
-                        sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:${DATESTAMP} ${it}/${IMAGE_NAME}:${DATESTAMP}'
+                    env.REGISTRY.tokenize(",").each { REG -> 
+                        echo "Pushing image to registry ${REG}"
+                        sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:latest ${REG}/${IMAGE_NAME}:latest'
+                        sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:${DATESTAMP} ${REG}/${IMAGE_NAME}:${DATESTAMP}'
                     }
                 }
                 sh 'timedatectl'
