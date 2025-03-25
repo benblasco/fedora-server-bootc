@@ -22,7 +22,7 @@ RUN <<EOF
     hdparm sdparm lshw \
     tuned cockpit* firewalld \
     python3-blivet stratis-cli stratisd \
-    tmux rclone\
+    tmux rclone tree \
     genisoimage cloud-utils \
     libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
     python3-libvirt python3-lxml edk2-ovmf \
