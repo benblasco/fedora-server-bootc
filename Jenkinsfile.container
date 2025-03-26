@@ -35,8 +35,8 @@ pipeline {
             steps {
                 echo 'Push the build to the registries'
                 echo "Pushing image to registry ${REGISTRY1}"
-                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:latest
-                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${DATESTAMP}
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:latest'
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${DATESTAMP}'
                 echo "Pushing image to registry ${REGISTRY2}"
                 sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:latest ${REGISTRY2}/${IMAGE_NAME}:latest'
                 sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${DATESTAMP}'
