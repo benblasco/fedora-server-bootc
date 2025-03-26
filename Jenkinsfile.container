@@ -3,7 +3,8 @@ pipeline {
         REPO_URL = "https://github.com/benblasco/fedora-server-bootc"
         REPO_BRANCH = "main"
         IMAGE_NAME = "fedora-bootc-testserver"
-        REGISTRY = "['micro.lan:5000','nuc.lan:5000']"
+        REGISTRY1 = "micro.lan:5000"
+        REGISTRY2 = "nuc.lan:5000"
         DATESTAMP = sh(
                         script: """
                         date +%Y%m%d
@@ -27,20 +28,18 @@ pipeline {
         stage('Build the image') {
             steps {
                 echo 'Build the Fedora Bootc Container'
-                sh 'sudo podman build --pull=always -t ${REGISTRY[0]}/${IMAGE_NAME}:latest -t ${REGISTRY[0]}/${IMAGE_NAME}:${DATESTAMP} .'
+                sh 'sudo podman build --pull=always -t ${REGISTRY1}/${IMAGE_NAME}:latest -t ${REGISTRY1}/${IMAGE_NAME}:${DATESTAMP} .'
             }
         }
         stage('Push to the container registry') {
             steps {
-                echo 'Push the build to the registry/registries'
-                script {
-                    env.REGISTRY.tokenize(",").each { REG -> 
-                        echo "Pushing image to registry ${REG}"
-                        sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:latest ${REG}/${IMAGE_NAME}:latest'
-                        sh 'sudo podman push --tls-verify=false ${REGISTRY[0]}/${IMAGE_NAME}:${DATESTAMP} ${REG}/${IMAGE_NAME}:${DATESTAMP}'
-                    }
-                }
-                sh 'timedatectl'
+                echo 'Push the build to the registries'
+                echo "Pushing image to registry ${REGISTRY1}"
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:latest
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${DATESTAMP}
+                echo "Pushing image to registry ${REGISTRY2}"
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:latest ${REGISTRY2}/${IMAGE_NAME}:latest'
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${DATESTAMP}'
             }
         }
     }
