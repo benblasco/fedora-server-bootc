@@ -78,6 +78,7 @@ LABEL=SEAGATE1 /mnt/sg1 ext4 defaults,nofail 0 0
 LABEL=WD_SG3 /mnt/sg3 ext4 defaults,nofail 0 0
 LABEL=WD_XFS1 /mnt/wd_xfs1 xfs defaults,nofail 0 0
 LABEL=WD_MARTIN /mnt/martinbackup ext4 defaults,nofail 0 0
+LABEL=WD_SPARE /mnt/spare xfs defaults,nofail 0 0
 nuc.lan:/mnt/sg2 /mnt/sg2 nfs x-systemd.after=network-online.target 0 0
 nuc.lan:/var/mnt/vm_images /mnt/vm_images nfs x-systemd.after=network-online.target 0 0
 EOF
