@@ -41,6 +41,7 @@ pipeline {
                 sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:latest ${REGISTRY2}/${IMAGE_NAME}:latest'
                 sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${DATESTAMP}'
             }
+        }
         stage('Clean up local images') {
             steps {
                 echo 'Clean up local images'
