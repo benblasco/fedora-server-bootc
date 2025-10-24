@@ -11,7 +11,7 @@ RUN <<EOF
     dnf install -y http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
     dnf update -y
     dnf install -y \
-    p7zip p7zip-plugins unrar rsync \
+    p7zip p7zip-plugins unrar unzip rsync \
     vim-enhanced htop openssh-server grubby git \
     wpa_supplicant screen mc smartmontools \
     python3-requests-oauthlib \
