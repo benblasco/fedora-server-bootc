@@ -1,4 +1,4 @@
-FROM quay.io/fedora/fedora-bootc:41
+FROM quay.io/fedora/fedora-bootc:42
 
 # RUN dnf -y golang && dnf clean all
 # RUN ln -sfr /usr/lib/golang/bin/go /usr/bin/go
@@ -11,12 +11,12 @@ RUN <<EOF
     dnf install -y http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
     dnf update -y
     dnf install -y \
-    p7zip p7zip-plugins unrar rsync \
+    p7zip p7zip-plugins unrar unzip rsync \
     vim-enhanced htop openssh-server grubby git \
     wpa_supplicant screen mc smartmontools \
     python3-requests-oauthlib \
     lm_sensors lm_sensors-sensord \
-    java-17-openjdk dnf-utils \
+    java-latest-openjdk dnf-utils \
     setools-console setroubleshoot-server \
     strace ncdu python3-pip \
     hdparm sdparm lshw \
@@ -35,7 +35,7 @@ EOF
 # Packages required for each Ansible role
 ### Command to get the list
 # cd /var/home/bblasco/.ansible/collections/ansible_collections/fedora/linux_system_roles/roles
-# for i in `echo "storage firewall timesync cockpit podman"`; do echo ROLE $i; $i/.ostree/get_ostree_data.sh packages runtime Fedora-41 raw; done
+# for i in `echo "storage firewall timesync cockpit podman"`; do echo ROLE $i; $i/.ostree/get_ostree_data.sh packages runtime Fedora-42 raw; done
 ### storage
 # cryptsetup e2fsprogs kpartx libblockdev-crypto libblockdev-dm \
 # libblockdev-lvm libblockdev-mdraid libblockdev-swap lvm2 python3-blivet \
