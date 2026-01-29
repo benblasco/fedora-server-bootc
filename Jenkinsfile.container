@@ -37,11 +37,13 @@ pipeline {
                 echo "Pushing image to registry ${REGISTRY1}"
                 sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
                 sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}"
+
                 echo "Pushing image to registry ${REGISTRY2}"
-                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
-                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}"
                 // sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
-                // sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}"
+                // sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}"
+
+                echo "Copying image to registry ${REGISTRY2}"
+                sh "sudo skopeo copy --tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
             }
         }
         stage('Clean up local images') {
