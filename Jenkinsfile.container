@@ -28,7 +28,7 @@ pipeline {
         stage('Build the image') {
             steps {
                 echo 'Build the Fedora Bootc Container'
-                sh "sudo podman build --pull=always -t ${REGISTRY1}/${IMAGE_NAME}:latest -t ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP} ."
+                sh "sudo podman build --pull=always -t ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH} -t ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP} ."
             }
         }
         stage('Push to the container registry') {
@@ -36,7 +36,7 @@ pipeline {
                 echo 'Push the build to the registries'
                 echo "Pushing image to registry ${REGISTRY1}"
                 sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP}"
-                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP} ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}"
+                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}"
                 echo "Pushing image to registry ${REGISTRY2}"
                 sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP}"
                 sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${env.REPO_BRANCH}"
