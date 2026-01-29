@@ -28,7 +28,7 @@ pipeline {
         stage('Build the image') {
             steps {
                 echo 'Build the Fedora Bootc Container'
-                sh "sudo podman build --pull=always -t ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH} -t ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP}" .
+                sh 'sudo podman build --pull=always -t ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} -t ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} .'
             }
         }
         stage('Push to the container registry') {
