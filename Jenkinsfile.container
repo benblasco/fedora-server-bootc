@@ -38,8 +38,8 @@ pipeline {
                 sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
                 sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}"
                 echo "Pushing image to registry ${REGISTRY2}"
-                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
-                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}"
+                #sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
+                #sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}"
             }
         }
         stage('Clean up local images') {
