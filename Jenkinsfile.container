@@ -34,23 +34,20 @@ pipeline {
         stage('Push to the container registry') {
             steps {
                 echo 'Push the build to the registries'
-                echo "Pushing image to registry ${REGISTRY1}"
-                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
-                sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}"
+                echo 'Pushing image to registry ${REGISTRY1}'
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
+                sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}'
 
-                echo "Pushing image to registry ${REGISTRY2}"
-                // sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
-                // sh "sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} ${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}"
-
-                echo "Copying image to registry ${REGISTRY2}"
-                sh 'sudo skopeo copy --tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
+                echo 'Copying image to registry ${REGISTRY2}'
+                sh 'sudo skopeo copy --source-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
+                sh 'sudo skopeo copy --source-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}'
             }
         }
         stage('Clean up local images') {
             steps {
                 echo 'Clean up local images'
-                sh "sudo podman image rm ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}-${DATESTAMP}"
-                sh "sudo podman image rm ${REGISTRY1}/${IMAGE_NAME}:${env.REPO_BRANCH}"
+                sh 'sudo podman image rm ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
+                sh 'sudo podman image rm ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}'
                 sh 'sudo podman image prune -f'
             }
         }
