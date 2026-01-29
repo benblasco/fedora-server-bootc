@@ -39,8 +39,8 @@ pipeline {
                 sh 'sudo podman push --tls-verify=false ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}'
 
                 echo 'Copying image to registry ${REGISTRY2}'
-                sh 'sudo skopeo copy --source-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
-                sh 'sudo skopeo copy --source-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}'
+                sh 'sudo skopeo copy --src-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
+                sh 'sudo skopeo copy --src-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}'
             }
         }
         stage('Clean up local images') {
