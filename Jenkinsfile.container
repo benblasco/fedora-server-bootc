@@ -1,7 +1,7 @@
 pipeline {
     environment {
         REPO_URL = "https://github.com/benblasco/fedora-server-bootc"
-        REPO_BRANCH = "main"
+        REPO_BRANCH = "fedora-43-devel"
         IMAGE_NAME = "fedora-server-bootc"
         REGISTRY1 = "micro.lan:5000"
         REGISTRY2 = "nuc.lan:5000"
