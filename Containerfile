@@ -27,7 +27,7 @@ RUN <<EOF
     libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
     python3-libvirt python3-lxml edk2-ovmf \
     podman buildah skopeo \
-    alsa-utils fwupd-efi usbutils
+    alsa-utils fwupd-efi usbutils guestfs-tools
 
     rm -rf /var/{cache,log} /var/lib/{dnf,rhsm}
 EOF
