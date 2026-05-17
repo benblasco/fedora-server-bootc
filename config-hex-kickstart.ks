@@ -18,7 +18,7 @@ reqpart --add-boot
 #autopart --noswap --type=lvm
 
 # Add the container image to install
-ostreecontainer --url micro.lan:5000/fedora-server-bootc:fedora-43-devel --no-signature-verification --transport=registry
+ostreecontainer --url micro.lan:5000/fedora-bootc-testserver:latest --no-signature-verification --transport=registry
 
 # Disk partitioning information
 # https://developers.redhat.com/articles/2024/08/20/bare-metal-deployments-image-mode-rhel?source=sso#example_kickstart
@@ -31,6 +31,7 @@ logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
 logvol /var/lib/containers/storage --vgname=vg_fedora --size=10240 --name=lv_root_containers --fstype=xfs
 logvol /var/mnt/containers --vgname=vg_fedora --size=10240 --name=lv_user_containers --fstype=xfs
 logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=204800 --name=lv_vm_pool --fstype=xfs
+logvol swap --vgname=vg_fedora --size=32768 --name=lv_swap --fstype=swap
 
 # https://docs.fedoraproject.org/en-US/fedora/f36/install-guide/appendixes/Kickstart_Syntax_Reference/#sect-kickstart-commands-users-groups
 # Generate an ssh key using the command `openssl passwd -6`

@@ -31,6 +31,7 @@ logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
 logvol /var/lib/containers/storage --vgname=vg_fedora --size=10240 --name=lv_root_containers --fstype=xfs
 logvol /var/mnt/containers --vgname=vg_fedora --size=10240 --name=lv_user_containers --fstype=xfs
 logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=204800 --name=lv_vm_pool --fstype=xfs
+logvol swap --vgname=vg_fedora --size=32768 --name=lv_swap --fstype=swap
 
 # https://docs.fedoraproject.org/en-US/fedora/f36/install-guide/appendixes/Kickstart_Syntax_Reference/#sect-kickstart-commands-users-groups
 # Generate an ssh key using the command `openssl passwd -6`
