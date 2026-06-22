@@ -45,6 +45,7 @@ volgroup vg_fedora pv.01
 logvol / --vgname=vg_fedora --size=25200 --name=lv_root --fstype=xfs
 logvol /var --vgname=vg_fedora --size=10240 --name=lv_var --fstype=xfs
 logvol /var/log --vgname=vg_fedora --size=10240 --name=lv_varlog --fstype=xfs
+logvol /var/backups --vgname=vg_fedora --size=20480 --name=lv_varbackups --fstype=xfs
 logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
 logvol /var/lib/containers/storage --vgname=vg_fedora --size=20480 --name=lv_root_containers --fstype=xfs
 logvol /var/mnt/containers --vgname=vg_fedora --size=40960 --name=lv_user_containers --fstype=xfs
@@ -73,6 +74,11 @@ sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNl
 semanage fcontext -a -e /var/lib/containers '/mnt/containers(/.*)?'
 restorecon -Rv /mnt/containers
 chmod 777 /var/mnt/containers
+
+# Anaconda creates /var/backups as root:root 0755; allow regular users to create
+# their own backup directories. Sticky bit (1777) lets anyone create but only
+# the owner (or root) can delete/rename entries, similar to /tmp.
+chmod 1777 /var/backups
 
 cat >> /etc/fstab<<EOF
 LABEL=SEAGATE1 /var/mnt/sg1 ext4 defaults,nofail 0 0
