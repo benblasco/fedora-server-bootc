@@ -27,10 +27,11 @@ volgroup vg_fedora pv.01
 logvol / --vgname=vg_fedora --size=25200 --name=lv_root --fstype=xfs
 logvol /var --vgname=vg_fedora --size=10240 --name=lv_var --fstype=xfs
 logvol /var/log --vgname=vg_fedora --size=10240 --name=lv_varlog --fstype=xfs
+logvol /var/backups --vgname=vg_fedora --size=20480 --name=lv_varbackups --fstype=xfs
 logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
 logvol /var/lib/containers/storage --vgname=vg_fedora --size=10240 --name=lv_root_containers --fstype=xfs
 logvol /var/mnt/containers --vgname=vg_fedora --size=10240 --name=lv_user_containers --fstype=xfs
-logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=204800 --name=lv_vm_pool --fstype=xfs
+logvol /var/lib/libvirt/vm-pool --vgname=vg_fedora --size=512000 --name=lv_vm_pool --fstype=xfs
 logvol swap --vgname=vg_fedora --size=32768 --name=lv_swap --fstype=swap
 
 # https://docs.fedoraproject.org/en-US/fedora/f36/install-guide/appendixes/Kickstart_Syntax_Reference/#sect-kickstart-commands-users-groups
@@ -40,5 +41,28 @@ user --name=media --uid=1001 --gid=1001 --homedir=/var/home/media
 group --name=bblasco --gid=1000
 user --name=bblasco --uid=1000 --gid=1000 --homedir=/var/home/bblasco --shell=/bin/bash --groups=wheel,media,libvirt --iscrypted --password=$6$ArTIFqSrXLP8FNs6$bRAmZtJduALiKsZOSMo28mnW8nlNKqPw7zTf5YMdaTgsqjLHqGNYS4zoGRd1v43rF8P16araFnQabBuFxyNfL.
 sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNlBGHxQGNYlDkB35Z/kPQNR+tfsYaO2gGLhbtkVI0uoXf5SewEz5ecH+u8jHIPElXZz227h5PpxhZFzfokqUJ/U3mbEpu1/Krf4/eERCqIgz2nmXoGLlOJHgMk4MpK6LA6eb6SXZHLpxFicbEcCxUU3A9hbzhWUGDaMFG7CcExT5JAD/7VcniONxZhlJxUzyL1xmbmAN13DQpiUkew25VtuNHby1fYTgMxVaezUMfMwZn6qpNJUDXGCKX1NWv5kqB9yFxRIQbFS4zAkQPXH6w7eksNyknexRDwM1zghnaspSvE1Kn2RWIaKt5hmaoKozJuC9YnCwJ bblasco@localhost.localdomain"
+
+%post --log=/root/ks-post.log
+
+# Anaconda creates /var/backups as root:root 0755; allow regular users to create
+# their own backup directories. Sticky bit (1777) lets anyone create but only
+# the owner (or root) can delete/rename entries, similar to /tmp.
+chmod 1777 /var/backups
+
+# VLAN 140 and bridge connection required for RHIS VMs.
+# L2 bridge for libvirt VLAN 140 passthrough.
+# Management DHCP remains on the untagged physical NIC from the kickstart
+# network line above. VMs attach to br140 via vm-network-vlan140.
+BASE_IFACE=eno1
+VLAN_IFACE="${BASE_IFACE}.140"
+
+nmcli --offline connection add type vlan con-name "${VLAN_IFACE}" dev "${BASE_IFACE}" id 140
+nmcli --offline connection add type bridge con-name br140 ifname br140 stp no
+nmcli --offline connection modify "${VLAN_IFACE}" master br140 slave-type bridge
+nmcli --offline connection modify br140 ipv4.method disabled ipv6.method ignore
+nmcli --offline connection modify "${VLAN_IFACE}" connection.autoconnect yes
+nmcli --offline connection modify br140 connection.autoconnect yes
+
+%end
 
 reboot

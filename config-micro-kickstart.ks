@@ -45,6 +45,7 @@ volgroup vg_fedora pv.01
 logvol / --vgname=vg_fedora --size=25200 --name=lv_root --fstype=xfs
 logvol /var --vgname=vg_fedora --size=10240 --name=lv_var --fstype=xfs
 logvol /var/log --vgname=vg_fedora --size=10240 --name=lv_varlog --fstype=xfs
+logvol /var/backups --vgname=vg_fedora --size=20480 --name=lv_varbackups --fstype=xfs
 logvol /var/home --vgname=vg_fedora --size=20480 --name=lv_home --fstype=xfs
 logvol /var/lib/containers/storage --vgname=vg_fedora --size=20480 --name=lv_root_containers --fstype=xfs
 logvol /var/mnt/containers --vgname=vg_fedora --size=40960 --name=lv_user_containers --fstype=xfs
@@ -74,6 +75,11 @@ semanage fcontext -a -e /var/lib/containers '/mnt/containers(/.*)?'
 restorecon -Rv /mnt/containers
 chmod 777 /var/mnt/containers
 
+# Anaconda creates /var/backups as root:root 0755; allow regular users to create
+# their own backup directories. Sticky bit (1777) lets anyone create but only
+# the owner (or root) can delete/rename entries, similar to /tmp.
+chmod 1777 /var/backups
+
 cat >> /etc/fstab<<EOF
 LABEL=SEAGATE1 /var/mnt/sg1 ext4 defaults,nofail 0 0
 LABEL=WD_SG3 /var/mnt/sg3 ext4 defaults,nofail 0 0
@@ -83,6 +89,20 @@ LABEL=WD_SPARE /var/mnt/spare xfs defaults,nofail 0 0
 nuc.lan:/var/mnt/sg2 /mnt/sg2 nfs x-systemd.after=network-online.target 0 0
 nuc.lan:/var/mnt/vm_images /mnt/vm_images nfs x-systemd.after=network-online.target 0 0
 EOF
+
+# VLAN 140 and bridge connection required for RHIS VMs.
+# L2 bridge for libvirt VLAN 140 passthrough.
+# Management DHCP remains on the untagged physical NIC from the kickstart
+# network line above. VMs attach to br140 via vm-network-vlan140.
+BASE_IFACE=enp2s0f0
+VLAN_IFACE="${BASE_IFACE}.140"
+
+nmcli --offline connection add type vlan con-name "${VLAN_IFACE}" dev "${BASE_IFACE}" id 140
+nmcli --offline connection add type bridge con-name br140 ifname br140 stp no
+nmcli --offline connection modify "${VLAN_IFACE}" master br140 slave-type bridge
+nmcli --offline connection modify br140 ipv4.method disabled ipv6.method ignore
+nmcli --offline connection modify "${VLAN_IFACE}" connection.autoconnect yes
+nmcli --offline connection modify br140 connection.autoconnect yes
 
 %end
 
