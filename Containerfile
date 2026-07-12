@@ -23,7 +23,7 @@ RUN <<EOF
     tuned cockpit* firewalld \
     python3-blivet stratis-cli stratisd \
     tmux rclone tree \
-    genisoimage cloud-utils \
+    genisoimage cloud-utils cloud-utils-cloud-localds \
     libgcrypt libgcrypt-devel libvirt libvirt-daemon-kvm qemu-kvm \
     python3-libvirt python3-lxml edk2-ovmf \
     podman buildah skopeo \
