@@ -14,6 +14,7 @@ pipeline {
     agent { label 'fedora-server-bootc' }
     triggers {
         cron('H 6 * * 7') // Build between 6am and 7am every Sunday
+    }
     stages {
         stage('Identify build node') {
             steps {
