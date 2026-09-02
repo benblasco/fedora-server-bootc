@@ -31,6 +31,14 @@ pipeline {
         stage('Build the image') {
             steps {
                 echo 'Build the Fedora Bootc Container'
+                sh '''
+                    usage=$(df --output=pcent /var/lib/containers/storage | tail -1 | tr -d ' %')
+                    if [ "$usage" -gt 90 ]; then
+                        echo "Podman storage is ${usage}% full (threshold: 90%)"
+                        df -h /var/lib/containers/storage
+                        exit 1
+                    fi
+                '''
                 sh 'sudo podman build --pull=always -t ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} -t ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} .'
             }
         }
@@ -46,21 +54,16 @@ pipeline {
                 sh 'sudo skopeo copy --src-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}'
             }
         }
-        stage('Clean up local images') {
-            steps {
-                echo 'Clean up local images'
-                sh 'sudo podman image rm ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
-                sh 'sudo podman image rm ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}'
-                sh 'sudo podman image prune -f'
-            }
+    }
+    post {
+        always {
+            echo 'Clean up local images and podman storage'
+            sh """
+                sudo podman image rm '${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP.trim()}' || true
+                sudo podman image rm '${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}' || true
+                sudo podman system prune -af --build
+                df -h /var/lib/containers/storage
+            """
         }
     }
-    //post {
-        //always {
-            //archiveArtifacts artifacts: 'fedora-server-bootc', fingerprint: true
-            //mail to: 'team@example.com',
-              //subject: "Librespot build result: ${currentBuild.fullDisplayName}",
-              //body: "This is what we did ${env.BUILD_URL}"
-        //}
-    //}
 }
