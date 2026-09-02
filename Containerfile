@@ -8,6 +8,7 @@ FROM quay.io/fedora/fedora-bootc:44
 # https://github.com/containers/bootc/issues/975
 # Enable RPMfusion repos, update, install common packages, clean up
 RUN <<EOF
+set -euo pipefail
     dnf install -y http://download1.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm http://download1.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
     dnf update -y
     dnf install -y \
@@ -70,13 +71,15 @@ EOF
 COPY files/etc /etc/
 
 # Create the journal file
-RUN <<EOF 
+RUN <<EOF
+set -euo pipefail
     mkdir -p /var/log/journal 
     chown root:systemd-journal /var/log/journal
 EOF
 
 # Enable tuned, podman-podman-auto-update, and disable bootc auto updates
-RUN <<EOF 
+RUN <<EOF
+set -euo pipefail
     systemctl enable tuned.service
     systemctl enable podman-auto-update.timer
     systemctl mask bootc-fetch-apply-updates.timer
@@ -88,6 +91,7 @@ EOF
 # This can be done through an ansible playbook or via other means
 # Note: the sed command is using the "|" character as a delimiter
 RUN <<EOF
+set -euo pipefail
     mkdir -p -m 777 /var/mnt/containers
     cp -p /usr/share/containers/storage.conf /etc/containers/
     sed -i '\|# rootless_storage_path|a rootless_storage_path = "/var/mnt/containers/$USER/storage"' /etc/containers/storage.conf
