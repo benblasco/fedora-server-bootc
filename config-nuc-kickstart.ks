@@ -49,6 +49,10 @@ sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNl
 # the owner (or root) can delete/rename entries, similar to /tmp.
 chmod 1777 /var/backups
 
+cat >> /etc/fstab<<EOF
+LABEL=WD_SG2 /var/mnt/sg2 ext4 defaults,nofail 0 0
+EOF
+
 # VLAN 140 and bridge connection required for RHIS VMs.
 # L2 bridge for libvirt VLAN 140 passthrough.
 # Management DHCP remains on the untagged physical NIC from the kickstart
