@@ -51,6 +51,9 @@ chmod 1777 /var/backups
 
 cat >> /etc/fstab<<EOF
 LABEL=WD_SG2 /var/mnt/sg2 ext4 defaults,nofail 0 0
+# Samsung SSD volumes
+UUID=52963788-f3a3-44dc-aeef-68bbb0aa1871 /var/mnt/general xfs defaults 0 0
+UUID=c02f2ec1-fe5a-4983-a864-4a7990a40c8e /var/mnt/vm_images xfs defaults 0 0
 EOF
 
 # VLAN 140 and bridge connection required for RHIS VMs.
