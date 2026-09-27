@@ -11,6 +11,10 @@ EOF
 
 text --non-interactive
 network --bootproto=dhcp --device=link --activate --onboot=on
+# Anaconda writes mutable /etc/localtime during ostree/bootc install. Without this line
+# it defaults to America/New_York, which overrides the Australia/Melbourne symlink in the
+# container image (Containerfile) on first boot.
+timezone Australia/Melbourne
 zerombr
 # For the command below it is critical to specify the disk otherwise it will erase ALL disks attached to the system
 clearpart --drives=nvme0n1 --all --initlabel --disklabel=gpt
@@ -43,6 +47,10 @@ user --name=bblasco --uid=1000 --gid=1000 --homedir=/var/home/bblasco --shell=/b
 sshkey --username bblasco "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCY9P2Hh1ultuvNlBGHxQGNYlDkB35Z/kPQNR+tfsYaO2gGLhbtkVI0uoXf5SewEz5ecH+u8jHIPElXZz227h5PpxhZFzfokqUJ/U3mbEpu1/Krf4/eERCqIgz2nmXoGLlOJHgMk4MpK6LA6eb6SXZHLpxFicbEcCxUU3A9hbzhWUGDaMFG7CcExT5JAD/7VcniONxZhlJxUzyL1xmbmAN13DQpiUkew25VtuNHby1fYTgMxVaezUMfMwZn6qpNJUDXGCKX1NWv5kqB9yFxRIQbFS4zAkQPXH6w7eksNyknexRDwM1zghnaspSvE1Kn2RWIaKt5hmaoKozJuC9YnCwJ bblasco@localhost.localdomain"
 
 %post --log=/root/ks-post.log
+
+# Keep the firmware clock in UTC (timedatectl LocalRTC=no). Avoids DST and timezone-change
+# skew when the kernel applies RTC offsets at boot; chrony/NTP maintains wall-clock time.
+timedatectl set-local-rtc 0
 
 # Anaconda creates /var/backups as root:root 0755; allow regular users to create
 # their own backup directories. Sticky bit (1777) lets anyone create but only
