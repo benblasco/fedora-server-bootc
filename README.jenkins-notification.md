@@ -33,7 +33,11 @@ Same JSON as backup notifications in [backups-personal](https://github.com/benbl
 {"message":"…","number":"+…","recipients":["group.…"]}
 ```
 
-Example message: `JENKINS fedora-server-bootc #42: success | branch=main | fedora-server-bootc:main (20260929)`.
+Example message: `JENKINS fedora-server-bootc #42: success | branch=main | fedora-server-bootc:main (20260929) | size=1.5GiB`.
+
+### Image size (`size=`)
+
+On success, the pipeline appends `size=…` (IEC binary, e.g. `1.5GiB`). The value is the **sum of compressed layer sizes** from `skopeo inspect` on the image at **`nuc.lan:5000`** after `skopeo copy` — the same metric as registry pull/push blob size. It is **not** the larger figure shown by `podman images` (uncompressed virtual size). See comments in `Jenkinsfile.container` (Build and Push stages).
 
 ## Manual test
 
@@ -50,5 +54,6 @@ jq -n \
 
 ## Verify
 
-- Trigger a build; confirm the message in the Signal group.
+- Trigger a build; confirm the message in the Signal group (including `size=` on success).
+- In the build log, **Push to the container registry** should log `Registry image nuc.lan:5000/… compressed size: …`.
 - In the build log, the `httpRequest` step should run with `quiet: true` (no request body in the console).

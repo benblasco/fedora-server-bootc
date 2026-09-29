@@ -70,6 +70,7 @@ pipeline {
         stage('Build the image') {
             steps {
                 echo 'Build the Fedora Bootc Container'
+                // Fail fast before a long build if rootful Podman storage is nearly full.
                 sh '''
                     usage=$(df --output=pcent /var/lib/containers/storage | tail -1 | tr -d ' %')
                     if [ "$usage" -gt 90 ]; then
@@ -78,6 +79,9 @@ pipeline {
                         exit 1
                     fi
                 '''
+                // Tag twice: floating branch name and (not quite) immutable YYYYMMDD (env.DATESTAMP).
+                // Both names refer to the same image ID; the datestamp tag is what we
+                // inspect on nuc.lan after push for compressed layer size (Push stage).
                 sh 'sudo podman build --pull=newer -t ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} -t ${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} .'
             }
         }
@@ -91,12 +95,30 @@ pipeline {
                 echo 'Copying image to registry ${REGISTRY2}'
                 sh 'sudo skopeo copy --src-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}'
                 sh 'sudo skopeo copy --src-tls-verify=false --dest-tls-verify=false docker://${REGISTRY1}/${IMAGE_NAME}:${REPO_BRANCH} docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}'
+
+                // Compressed image size from the copy on nuc.lan (REGISTRY2), for logs and Signal.
+                // skopeo inspect reads the registry manifest; LayersData[].Size is each layer blob
+                // compressed (gzip). Sum those bytes — not podman images "virtual" uncompressed size.
+                // Skopeo 1.22+ has no top-level Size for --format; jq must be on the agent.
+                script {
+                    def imageRef = "${env.REGISTRY2}/${env.IMAGE_NAME}:${env.REPO_BRANCH}-${env.DATESTAMP.trim()}"
+                    env.IMAGE_SIZE = sh(
+                        script: """
+                            sudo skopeo inspect --tls-verify=false 'docker://${imageRef}' \\
+                                | jq '[.LayersData[].Size] | add' \\
+                                | numfmt --to=iec-i --suffix=B
+                        """,
+                        returnStdout: true
+                    ).trim()
+                    echo "Registry image ${imageRef} compressed size: ${env.IMAGE_SIZE}"
+                }
             }
         }
     }
     post {
         success {
-            script { signalNotify('success') }
+            // IMAGE_SIZE set in Push stage (skopeo inspect on nuc.lan); see README.jenkins-notification.md.
+            script { signalNotify('success', "size=${env.IMAGE_SIZE ?: 'unknown'}") }
         }
         failure {
             script {
