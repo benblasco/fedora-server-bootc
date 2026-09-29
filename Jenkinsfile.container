@@ -1,8 +1,11 @@
 import groovy.json.JsonOutput
 
+// Post-build Signal alert via signal-cli REST API (/v2/send). Same JSON shape as homelab
+// backup notifications; see README.jenkins-notification.md for Jenkins credential setup.
 def signalNotify(String result, String extra = '') {
     def stamp = env.DATESTAMP?.trim() ?: ''
-    def msg = "${env.JOB_NAME} #${env.BUILD_NUMBER}: ${result} | branch=${env.BRANCH_NAME} | ${env.IMAGE_NAME}:${env.REPO_BRANCH}"
+    // Homelab-style one-line summary: job outcome, branch, image tag, optional build datestamp.
+    def msg = "JENKINS ${env.JOB_NAME} #${env.BUILD_NUMBER}: ${result} | branch=${env.BRANCH_NAME} | ${env.IMAGE_NAME}:${env.REPO_BRANCH}"
     if (stamp) {
         msg += " (${stamp})"
     }
@@ -14,11 +17,13 @@ def signalNotify(String result, String extra = '') {
         string(credentialsId: 'signal_number', variable: 'SIGNAL_NUMBER'),
         string(credentialsId: 'signal_group_id', variable: 'SIGNAL_GROUP_ID'),
     ]) {
+        // JsonOutput escapes quotes/newlines in msg (e.g. failure log tail).
         def body = JsonOutput.toJson([
             message: msg,
             number: env.SIGNAL_NUMBER,
             recipients: [env.SIGNAL_GROUP_ID],
         ])
+        // Do not fail the build if Signal API is unreachable; see catchError + validResponseCodes.
         catchError(buildResult: null, stageResult: null) {
             httpRequest(
                 httpMode: 'POST',
@@ -26,7 +31,7 @@ def signalNotify(String result, String extra = '') {
                 contentType: 'APPLICATION_JSON',
                 requestBody: body,
                 validResponseCodes: '100:599',
-                quiet: true,
+                quiet: true, // avoid printing request body (contains number and group id)
             )
         }
     }

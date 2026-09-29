@@ -33,7 +33,7 @@ Same JSON as backup notifications in [backups-personal](https://github.com/benbl
 {"message":"…","number":"+…","recipients":["group.…"]}
 ```
 
-Example message: `fedora-server-bootc #42: success | branch=main | fedora-server-bootc:main (20260929)`.
+Example message: `JENKINS fedora-server-bootc #42: success | branch=main | fedora-server-bootc:main (20260929)`.
 
 ## Manual test
 
