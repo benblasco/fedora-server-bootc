@@ -1,6 +1,8 @@
 # fedora-server-bootc
 Configs and automation for deploying Fedora bootc based servers in my home lab
 
+- [Jenkins Signal notifications](README.jenkins-notification.md) — post-build alerts for `Jenkinsfile.container`
+
 # Links
 
 Bootc docs
