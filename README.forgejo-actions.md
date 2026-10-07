@@ -9,7 +9,7 @@ Deploy and configure Forgejo Actions runners with [podman-container-yaml](https:
 - **`runs-on: fedora-server-bootc`**
 - Job container: [`quay.io/containers/aio`](https://quay.io/repository/containers/aio) (official Podman + Buildah + Skopeo image from [containers/image_build](https://github.com/containers/image_build))
 
-The workflow installs **`jq`** and **`curl`** once per job with `microdnf` (for `skopeo inspect` sizing and Signal notifications). No custom CI image is required.
+The workflow installs **`nodejs`**, **`git`**, **`jq`**, and **`curl`** once per job with `microdnf`. Node is required for JavaScript Actions (`actions/checkout`, `redhat-actions/buildah-build`). `jq`/`curl` support registry sizing and Signal notifications. No custom CI image is required beyond [`quay.io/containers/aio`](https://quay.io/repository/containers/aio).
 
 After changing runner labels or `container:` options in Ansible, re-run the playbook and restart `forgejo-runner.service`. See [README.forgejo.md](https://github.com/benblasco/podman-container-yaml/blob/main/README.forgejo.md) in that repo.
 
@@ -30,6 +30,14 @@ Add under the Forgejo repo → **Settings → Secrets** (same values as Jenkins;
 
 Scheduled workflows run only from the **default branch**.
 
+## Troubleshooting
+
+### `crun: executable file 'node' not found` on a `uses:` step
+
+The aio image is still the right choice for Buildah/Skopeo. Forgejo runs JavaScript Actions inside the job container and needs **`node`** on `PATH`. Install it in the bootstrap `microdnf` step (as in the workflow), or use a custom image that includes aio tools plus Node.js.
+
+Workflow YAML must exist on the repository **default branch** for the Actions tab and `workflow_dispatch` to list it.
+
 ## Verify
 
 On a runner host:
@@ -39,6 +47,7 @@ getenforce
 podman pull quay.io/containers/aio:latest
 podman run --rm quay.io/containers/aio:latest buildah version
 podman run --rm quay.io/containers/aio:latest skopeo version
+podman run --rm quay.io/containers/aio:latest sh -c 'microdnf install -y nodejs git && node --version && git --version'
 ```
 
 After a successful run:

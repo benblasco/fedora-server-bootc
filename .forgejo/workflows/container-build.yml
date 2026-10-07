@@ -17,11 +17,11 @@ jobs:
   build-and-push:
     runs-on: fedora-server-bootc
     steps:
-      - name: Install jq and curl for registry inspect and Signal
-        run: microdnf install -y jq curl
+      - name: Install CI dependencies (Node for actions, jq/curl for inspect and Signal)
+        run: microdnf install -y jq curl nodejs git
 
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set branch and datestamp
         run: |
