@@ -28,9 +28,6 @@ jobs:
           echo "REPO_BRANCH=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
           echo "DATESTAMP=$(date +%Y%m%d)" >> "$GITHUB_ENV"
 
-      - name: Identify build node
-        run: hostnamectl
-
       - name: Fail fast if container storage is nearly full
         run: |
           for path in /var/lib/containers/storage "$HOME/.local/share/containers/storage"; do
