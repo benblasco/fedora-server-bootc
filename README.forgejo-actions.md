@@ -13,6 +13,8 @@ The workflow installs **`nodejs`**, **`git`**, **`jq`**, and **`curl`** once per
 
 After changing runner labels or `container:` options in Ansible, re-run the playbook and restart `forgejo-runner.service`. See [README.forgejo.md](https://github.com/benblasco/podman-container-yaml/blob/main/README.forgejo.md) in that repo.
 
+**Runner version:** Homelab runners use **forgejo-runner v6.x**, which supports JavaScript actions through **`node20`** only. The workflow pins **`actions/checkout@v4`** (`runs.using: node20`). To use `checkout@v5`/`@v6` (`node24`), upgrade the runner to **[>= v9.1.0](https://codeberg.org/forgejo/runner/releases/tag/v9.1.0)** in podman-container-yaml, then restart `forgejo-runner.service`. Check on a runner host: `forgejo-runner --version` and `systemctl is-active forgejo-runner.service`.
+
 ## Repository secrets
 
 Add under the Forgejo repo → **Settings → Secrets** (same values as Jenkins; see [README.jenkins-notification.md](README.jenkins-notification.md)):
@@ -34,7 +36,14 @@ Scheduled workflows run only from the **default branch**.
 
 ### `crun: executable file 'node' not found` on a `uses:` step
 
-The aio image is still the right choice for Buildah/Skopeo. Forgejo runs JavaScript Actions inside the job container and needs **`node`** on `PATH`. Install it in the bootstrap `microdnf` step (as in the workflow), or use a custom image that includes aio tools plus Node.js.
+The aio image is still the right choice for Buildah/Skopeo. Forgejo runs JavaScript Actions inside the job container and needs **`node`** on `PATH`. Install it in the bootstrap `microdnf` step (as in the workflow), or use a custom image that includes aio tools plus Node.js. That does **not** replace the runner’s own Node runtime labels (`node20`, `node24`, etc.) declared in each action’s `action.yml`.
+
+### `runs.using` … `got node24` at job setup
+
+The runner validates each action before steps run. **`actions/checkout@v6`** (and v5) declare **`node24`**; **forgejo-runner v6.2.x** only allows `[composite docker node12 node16 node20 go]`. Symptom: job fails right after cloning the checkout action, with no checkout step executed.
+
+- **Fix in this repo:** keep **`actions/checkout@v4`** (`node20`). `redhat-actions/buildah-build@v2` is already `node20`.
+- **Fix on the host:** upgrade forgejo-runner to **>= v9.1.0**, then you may use newer checkout versions if you want.
 
 Workflow YAML must exist on the repository **default branch** for the Actions tab and `workflow_dispatch` to list it.
 
