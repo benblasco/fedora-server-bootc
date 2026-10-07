@@ -90,12 +90,14 @@ EOF
 # The below needs to be repeated post-install if a separate mount point is being created for container storage.
 # This can be done through an ansible playbook or via other means
 # Note: the sed command is using the "|" character as a delimiter
+# SELinux file context for /var/mnt/containers is defined in
+# files/etc/selinux/targeted/contexts/files/file_contexts.local (copied above via COPY files/etc).
+# semanage fcontext is not used here: libsemanage commit fails on Buildah overlay storage.
 RUN <<EOF
 set -euo pipefail
     mkdir -p -m 777 /var/mnt/containers
     cp -p /usr/share/containers/storage.conf /etc/containers/
     sed -i '\|# rootless_storage_path|a rootless_storage_path = "/var/mnt/containers/$USER/storage"' /etc/containers/storage.conf
-    semanage fcontext -a -t container_var_lib_t '/mnt/containers(/.*)?'
     restorecon -Rv /var/mnt/containers
 EOF
 
