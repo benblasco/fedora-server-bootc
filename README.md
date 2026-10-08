@@ -2,6 +2,8 @@
 Configs and automation for deploying Fedora bootc based servers in my home lab
 
 - [Jenkins Signal notifications](README.jenkins-notification.md) — post-build alerts for `Jenkinsfile.container`
+- [Forgejo Signal notifications](README.forgejo-notification.md) — post-build alerts for `container-build.yml`
+- [Forgejo Actions](README.forgejo-actions.md) — `.forgejo/workflows/container-build.yml` and runner setup
 
 # Links
 

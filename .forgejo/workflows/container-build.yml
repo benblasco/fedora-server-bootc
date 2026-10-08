@@ -1,0 +1,134 @@
+# Forgejo port of Jenkinsfile.container (privileged aio job container on fedora-server-bootc runner).
+# Runner label: podman-container-yaml run-podman-quadlet-forgejo.yml
+name: Build fedora-server-bootc container
+
+on:
+  schedule:
+    # Cron below is 19:15 UTC Saturday ≈ 06:15 Sunday AEDT.
+    # Forgejo Actions (like GitHub Actions) only evaluates on.schedule cron in UTC. 
+    - cron: "15 19 * * 6"
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: fedora-server-bootc
+  REGISTRY1: micro.lan:5000
+  REGISTRY2: nuc.lan:5000
+
+jobs:
+  build-and-push:
+    runs-on: fedora-server-bootc
+    steps:
+      - name: Install CI dependencies (Node for actions, jq/curl for inspect and Signal)
+        run: microdnf install -y jq curl nodejs git
+
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set branch and datestamp
+        run: |
+          echo "REPO_BRANCH=${GITHUB_REF_NAME}" >> "$GITHUB_ENV"
+          echo "DATESTAMP=$(date +%Y%m%d)" >> "$GITHUB_ENV"
+
+      - name: Fail fast if container storage is nearly full
+        run: |
+          for path in /var/lib/containers/storage "$HOME/.local/share/containers/storage"; do
+            if [ -d "$path" ]; then
+              usage=$(df --output=pcent "$path" | tail -1 | tr -d ' %')
+              if [ "$usage" -gt 90 ]; then
+                echo "Container storage at ${path} is ${usage}% full (threshold: 90%)"
+                df -h "$path"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Workaround empty docker config for registry actions
+        env:
+          auth: '{ "auths": {} }'
+        run: |
+          mkdir -p "$HOME/.docker"
+          echo "$auth" > "$HOME/.docker/config.json"
+
+      - name: Build image with Buildah
+        id: build-image
+        uses: redhat-actions/buildah-build@v3
+        with:
+          image: ${{ env.IMAGE_NAME }}
+          tags: ${{ env.REPO_BRANCH }} ${{ env.REPO_BRANCH }}-${{ env.DATESTAMP }}
+          containerfiles: |
+            ./Containerfile
+          extra-args: --pull=always
+          #extra-args: --pull=newer
+
+      - name: Push to micro.lan registry
+        run: |
+          img="${{ steps.build-image.outputs.image }}"
+          for tag in "${REPO_BRANCH}" "${REPO_BRANCH}-${DATESTAMP}"; do
+            buildah push --tls-verify=false "${img}:${tag}" \
+              "docker://${REGISTRY1}/${IMAGE_NAME}:${tag}"
+          done
+
+      - name: Mirror to nuc.lan registry
+        run: |
+          for tag in "${REPO_BRANCH}" "${REPO_BRANCH}-${DATESTAMP}"; do
+            skopeo copy --src-tls-verify=false --dest-tls-verify=false \
+              "docker://${REGISTRY1}/${IMAGE_NAME}:${tag}" \
+              "docker://${REGISTRY2}/${IMAGE_NAME}:${tag}"
+          done
+
+      - name: Record compressed registry image size
+        run: |
+          image_ref="docker://${REGISTRY2}/${IMAGE_NAME}:${REPO_BRANCH}-${DATESTAMP}"
+          size=$(skopeo inspect --tls-verify=false "${image_ref}" \
+            | jq '[.LayersData[].Size] | add' \
+            | numfmt --to=iec-i --suffix=B)
+          echo "IMAGE_SIZE=${size}" >> "$GITHUB_ENV"
+          echo "Registry image ${image_ref} compressed size: ${size}"
+
+      - name: Notify Signal on success
+        if: success()
+        continue-on-error: true
+        env:
+          SIGNAL_WEBHOOK_URL: ${{ secrets.SIGNAL_WEBHOOK_URL }}
+          SIGNAL_NUMBER: ${{ secrets.SIGNAL_NUMBER }}
+          SIGNAL_GROUP_ID: ${{ secrets.SIGNAL_GROUP_ID }}
+        run: |
+          msg="FORGEJO ${GITHUB_REPOSITORY} #${GITHUB_RUN_NUMBER}: success | branch=${REPO_BRANCH} | ${IMAGE_NAME}:${REPO_BRANCH} (${DATESTAMP}) | size=${IMAGE_SIZE}"
+          jq -n \
+            --arg message "$msg" \
+            --arg number "$SIGNAL_NUMBER" \
+            --arg recipient "$SIGNAL_GROUP_ID" \
+            '{message: $message, number: $number, recipients: [$recipient]}' \
+          | curl -sf -X POST "$SIGNAL_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d @-
+
+      - name: Notify Signal on failure
+        if: failure()
+        continue-on-error: true
+        env:
+          SIGNAL_WEBHOOK_URL: ${{ secrets.SIGNAL_WEBHOOK_URL }}
+          SIGNAL_NUMBER: ${{ secrets.SIGNAL_NUMBER }}
+          SIGNAL_GROUP_ID: ${{ secrets.SIGNAL_GROUP_ID }}
+        run: |
+          msg="FORGEJO ${GITHUB_REPOSITORY} #${GITHUB_RUN_NUMBER}: failure | branch=${REPO_BRANCH} | ${IMAGE_NAME}:${REPO_BRANCH}"
+          jq -n \
+            --arg message "$msg" \
+            --arg number "$SIGNAL_NUMBER" \
+            --arg recipient "$SIGNAL_GROUP_ID" \
+            '{message: $message, number: $number, recipients: [$recipient]}' \
+          | curl -sf -X POST "$SIGNAL_WEBHOOK_URL" \
+              -H "Content-Type: application/json" \
+              -d @-
+
+      - name: Clean up local images and buildah storage
+        if: always()
+        run: |
+          img="${{ steps.build-image.outputs.image }}"
+          for tag in "${REPO_BRANCH}" "${REPO_BRANCH}-${DATESTAMP}"; do
+            buildah rmi -f "${img}:${tag}" 2>/dev/null || true
+          done
+          buildah prune -af || true
+          for path in /var/lib/containers/storage "$HOME/.local/share/containers/storage"; do
+            [ -d "$path" ] && df -h "$path" || true
+          done
