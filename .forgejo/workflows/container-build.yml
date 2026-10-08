@@ -4,7 +4,8 @@ name: Build fedora-server-bootc container
 
 on:
   schedule:
-    # Jenkins: H 6 * * 7 (Sunday ~6am Australia/Melbourne). Cron below is 19:15 UTC Saturday ≈ 06:15 Sunday AEDT.
+    # Cron below is 19:15 UTC Saturday ≈ 06:15 Sunday AEDT.
+    # Forgejo Actions (like GitHub Actions) only evaluates on.schedule cron in UTC. 
     - cron: "15 19 * * 6"
   workflow_dispatch:
 
