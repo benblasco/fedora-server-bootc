@@ -56,7 +56,8 @@ jobs:
           tags: ${{ env.REPO_BRANCH }} ${{ env.REPO_BRANCH }}-${{ env.DATESTAMP }}
           containerfiles: |
             ./Containerfile
-          extra-args: --pull=newer
+          extra-args: --pull=always
+          #extra-args: --pull=newer
 
       - name: Push to micro.lan registry
         run: |
