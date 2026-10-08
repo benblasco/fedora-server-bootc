@@ -17,13 +17,7 @@ After changing runner labels or `container:` options in Ansible, re-run the play
 
 ## Repository secrets
 
-Add under the Forgejo repo → **Settings → Secrets** (same values as Jenkins; see [README.jenkins-notification.md](README.jenkins-notification.md)):
-
-| Secret | Jenkins credential ID |
-|--------|------------------------|
-| `SIGNAL_WEBHOOK_URL` | `signal_webhook_url` |
-| `SIGNAL_NUMBER` | `signal_number` |
-| `SIGNAL_GROUP_ID` | `signal_group_id` |
+Configure the three `SIGNAL_*` repository secrets per [README.forgejo-notification.md](README.forgejo-notification.md) (same values as Jenkins).
 
 ## Triggers
 
@@ -66,4 +60,4 @@ skopeo inspect --tls-verify=false "docker://nuc.lan:5000/fedora-server-bootc:mai
   | jq '[.LayersData[].Size] | add' | numfmt --to=iec-i --suffix=B
 ```
 
-Confirm the Signal group message includes `size=` on success.
+Confirm the Signal group message includes `size=` on success ([README.forgejo-notification.md](README.forgejo-notification.md)).
