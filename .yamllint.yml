@@ -1,0 +1,19 @@
+---
+# Forgejo Actions workflow YAML (see .pre-commit-config.yaml).
+extends: default
+
+rules:
+  document-start: disable
+  line-length:
+    max: 120
+  comments:
+    min-spaces-from-content: 1
+  comments-indentation: disable
+  braces:
+    max-spaces-inside: 1
+  octal-values:
+    forbid-implicit-octal: true
+    forbid-explicit-octal: true
+  truthy:
+    allowed-values: ['true', 'false', 'on']
+    check-keys: false

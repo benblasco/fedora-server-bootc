@@ -1,0 +1,6 @@
+# actionlint configuration
+# https://github.com/rhysd/actionlint/blob/main/docs/config.md
+
+self-hosted-runner:
+  labels:
+    - fedora-server-bootc

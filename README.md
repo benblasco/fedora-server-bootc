@@ -1,6 +1,28 @@
 # fedora-server-bootc
 Configs and automation for deploying Fedora bootc based servers in my home lab
 
+## Development
+
+Git commits run [pre-commit](https://pre-commit.com/) hooks (YAML, TOML, Forgejo Actions via actionlint, kickstart
+via ksvalidator, Containerfile via hadolint, gitleaks, shellcheck, markdown). **No `dnf install`** — tools use
+`pip install --user` and pre-commit’s cache under `~/.cache/pre-commit/`.
+
+```bash
+python3 -m pip install --user -r requirements-dev.txt
+export PATH="$HOME/.local/bin:$PATH"   # add to shell profile if needed
+pre-commit install
+pre-commit run --all-files             # first-time / CI-style check
+```
+
+Verify: `pre-commit --version`, `command -v pre-commit`, `getenforce`.
+
+Lint config: [`.yamllint.yml`](.yamllint.yml) (120 columns, comment spacing),
+[`.markdownlint-cli2.yaml`](.markdownlint-cli2.yaml) (MD013 on prose, 120 columns). **MD031** / **MD040** require
+blank lines around fenced blocks and a language tag on each fence. [`.github/actionlint.yaml`](.github/actionlint.yaml)
+registers the `fedora-server-bootc` runner label. [`.gitleaks.toml`](.gitleaks.toml) allowlists blueprint/kickstart
+paths with expected password hashes and SSH public keys. Hadolint runs via Podman
+([`.pre-commit/run-hadolint.sh`](.pre-commit/run-hadolint.sh); ignores **DL3007** / **DL3041**).
+
 - [Jenkins Signal notifications](README.jenkins-notification.md) — post-build alerts for `Jenkinsfile.container`
 - [Forgejo Signal notifications](README.forgejo-notification.md) — post-build alerts for `container-build.yml`
 - [Forgejo Actions](README.forgejo-actions.md) — `.forgejo/workflows/container-build.yml` and runner setup

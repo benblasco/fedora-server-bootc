@@ -1,0 +1,11 @@
+# Intentional install-time credentials in bootc blueprints and kickstart files.
+# https://github.com/gitleaks/gitleaks#configuration
+title = "fedora-server-bootc gitleaks"
+
+[allowlist]
+description = "Blueprint and kickstart paths with expected password hashes and SSH public keys"
+paths = [
+  '''(?i)config\.toml$''',
+  '''(?i)^testing/''',
+  '''(?i)\.ks$''',
+]
