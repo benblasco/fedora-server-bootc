@@ -73,7 +73,7 @@ COPY files/etc /etc/
 # Create the journal file
 RUN <<EOF
 set -euo pipefail
-    mkdir -p /var/log/journal 
+    mkdir -p /var/log/journal
     chown root:systemd-journal /var/log/journal
 EOF
 
@@ -85,7 +85,7 @@ set -euo pipefail
     systemctl mask bootc-fetch-apply-updates.timer
 EOF
 
-# How to change rootless users' container storage location 
+# How to change rootless users' container storage location
 # https://access.redhat.com/solutions/7007159
 # The below needs to be repeated post-install if a separate mount point is being created for container storage.
 # This can be done through an ansible playbook or via other means
