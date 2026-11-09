@@ -97,8 +97,8 @@ Edit the bootloader entry at boot time by:
 3. Adding `console=ttyS0,9600` to the line
 4. Pressing ctrl+x to resume booting the iso
 
-Note: Do not use the delete key to delete characters, and also note that the backspace key acts like the delete key in that it
-deletes forward, but not backward!
+Note: Do not use the delete key to delete characters, and also note that the backspace key acts like the delete key in that
+it deletes forward, but not backward!
 
 # Tasks to complete
 
